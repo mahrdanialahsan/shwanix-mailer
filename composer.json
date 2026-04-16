@@ -1,12 +1,12 @@
 {
-    "name": "danial/shwanix-mailer",
+    "name": "mahrdanial/shwanix-mailer",
     "description": "Laravel mail driver that sends messages through the Shwanix HTTP mail API",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Danial",
-            "email": "hello@shwanix.com"
+            "name": "Mahr Danial Ahsan",
+            "email": "mahrdanial@gmail.com"
         }
     ],
     "require": {
