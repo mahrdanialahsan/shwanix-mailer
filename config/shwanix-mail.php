@@ -15,6 +15,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | API key (optional)
+    |--------------------------------------------------------------------------
+    |
+    | Plain secret from env. When set, the client sends:
+    | - JSON field "api_key" (server validates against bcrypt-stored keys), and
+    | - Headers "X-API-Key" and "API-Key" (either style is accepted by the API).
+    | Omit when your endpoint does not require authentication.
+    |
+    */
+
+    'key' => env('SHWANIX_MAIL_KEY', ''),
+
+    /*
+    |--------------------------------------------------------------------------
     | HTTP client
     |--------------------------------------------------------------------------
     */

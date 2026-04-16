@@ -21,15 +21,28 @@ final class ShwanixApiClient
         int $recipientCount,
         int $timeout,
         int $connectTimeout,
-        bool $verifySsl
+        bool $verifySsl,
+        string $apiKey = ''
     ): void {
         try {
+            $headers = [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ];
+
+            $body = $payload;
+
+            if ($apiKey !== '') {
+                $headers['X-API-Key'] = $apiKey;
+                $headers['API-Key'] = $apiKey;
+                // Matches Shwanix Mail API: plain secret in JSON (validated against bcrypt server-side),
+                // or auth via X-API-Key / API-Key headers only.
+                $body = array_merge(['api_key' => $apiKey], $body);
+            }
+
             $response = $client->request('POST', $url, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ],
-                'json' => $payload,
+                'headers' => $headers,
+                'json' => $body,
                 'http_errors' => false,
                 'timeout' => $timeout,
                 'connect_timeout' => $connectTimeout,

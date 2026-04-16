@@ -22,7 +22,7 @@ Publish the optional configuration file:
 php artisan vendor:publish --tag=shwanix-mailer-config
 ```
 
-This creates `config/shwanix-mail.php` (endpoint URL, HTTP timeouts, SSL verification).
+This creates `config/shwanix-mail.php` (endpoint URL, API key, HTTP timeouts, SSL verification).
 
 ## What `MAIL_MAILER=shwanix` does
 
@@ -34,11 +34,14 @@ Setting **`MAIL_MAILER=shwanix`** tells Laravel to use this package’s custom t
 
 ### 1. Environment (`.env`)
 
-Minimum:
+Required:
 
 ```env
 MAIL_MAILER=shwanix
+SHWANIX_MAIL_KEY=your-plain-secret
 ```
+
+`SHWANIX_MAIL_KEY` is **required**. Use the plain secret registered for your app (validated server-side, e.g. against a bcrypt hash). Each request sends **`api_key`** in the JSON body and **`X-API-Key`** / **`API-Key`** headers with that value.
 
 Optional tuning (defaults are set in `config/shwanix-mail.php`):
 
@@ -71,7 +74,7 @@ To use Shwanix for **all** outgoing mail by default:
 
 ## Usage
 
-Use Laravel’s mail API as usual; no API key is required.
+Use Laravel’s mail API as usual. Ensure **`SHWANIX_MAIL_KEY`** is set in `.env` so requests authenticate with the Shwanix API.
 
 ```php
 use Illuminate\Support\Facades\Mail;
@@ -108,8 +111,8 @@ Mail::mailer('shwanix')->send(...);
 
 One `POST` with JSON body:
 
-- **Headers:** `Content-Type: application/json`, `Accept: application/json`
-- **Fields:** `to`, `cc`, `bcc` (comma-separated emails), `subject`, `body`, `attachments` (`filename`, `mime`, `content` base64)
+- **Headers:** `Content-Type: application/json`, `Accept: application/json`, **`X-API-Key`**, **`API-Key`** (values from `SHWANIX_MAIL_KEY`)
+- **Fields:** **`api_key`** (same secret), `to`, `cc`, `bcc` (comma-separated emails), `subject`, `body`, `attachments` (`filename`, `mime`, `content` base64)
 
 ## Implementation note (transport base class)
 

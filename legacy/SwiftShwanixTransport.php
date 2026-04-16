@@ -33,18 +33,23 @@ class SwiftShwanixTransport extends Transport
     /** @var bool */
     private $verifySsl;
 
+    /** @var string */
+    private $apiKey;
+
     public function __construct(
         string $url,
         ClientInterface $client,
         int $timeout = 30,
         int $connectTimeout = 10,
-        bool $verifySsl = true
+        bool $verifySsl = true,
+        string $apiKey = ''
     ) {
         $this->url = $url;
         $this->client = $client;
         $this->timeout = $timeout;
         $this->connectTimeout = $connectTimeout;
         $this->verifySsl = $verifySsl;
+        $this->apiKey = $apiKey;
     }
 
     /**
@@ -84,7 +89,8 @@ class SwiftShwanixTransport extends Transport
             $recipientCount,
             $this->timeout,
             $this->connectTimeout,
-            $this->verifySsl
+            $this->verifySsl,
+            $this->apiKey
         );
 
         $this->sendPerformed($message);

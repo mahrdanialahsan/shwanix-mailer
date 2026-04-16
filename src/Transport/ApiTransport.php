@@ -23,7 +23,8 @@ class ApiTransport extends AbstractTransport
         private ClientInterface $client,
         private int $timeout = 30,
         private int $connectTimeout = 10,
-        private bool $verifySsl = true
+        private bool $verifySsl = true,
+        private string $apiKey = ''
     ) {
         parent::__construct();
     }
@@ -82,7 +83,8 @@ class ApiTransport extends AbstractTransport
                 $recipientCount,
                 $this->timeout,
                 $this->connectTimeout,
-                $this->verifySsl
+                $this->verifySsl,
+                $this->apiKey
             );
         } catch (\RuntimeException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
