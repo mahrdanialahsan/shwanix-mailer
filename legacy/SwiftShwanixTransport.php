@@ -7,6 +7,7 @@
 
 namespace Danial\ShwanixMailer\Transport;
 
+use Danial\ShwanixMailer\RecipientFormat;
 use Danial\ShwanixMailer\ShwanixApiClient;
 use GuzzleHttp\ClientInterface;
 use Illuminate\Mail\Transport\Transport;
@@ -68,9 +69,9 @@ class SwiftShwanixTransport extends Transport
         }
 
         $payload = [
-            'to' => $to,
-            'cc' => $cc,
-            'bcc' => $bcc,
+            'to' => RecipientFormat::toApiField($to),
+            'cc' => RecipientFormat::toApiField($cc),
+            'bcc' => RecipientFormat::toApiField($bcc),
             'subject' => (string) $message->getSubject(),
             'body' => $this->extractBody($message),
             'attachments' => $this->collectAttachments($message),

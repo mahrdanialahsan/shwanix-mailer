@@ -48,11 +48,7 @@ SHWANIX_MAIL_CONNECT_TIMEOUT=10
 SHWANIX_MAIL_VERIFY_SSL=true
 ```
 
-The send endpoint defaults to **`https://send-mail.shwanix.com/send-mail.php`**. Override only if needed:
-
-```env
-SHWANIX_MAIL_URL=https://send-mail.shwanix.com/send-mail.php
-```
+The default API URL is defined in the published `config/shwanix-mail.php` file. Set `SHWANIX_MAIL_URL` in `.env` only when you need to override that value.
 
 ### 2. Mail config (`config/mail.php`)
 
@@ -75,7 +71,7 @@ To use Shwanix for **all** outgoing mail by default:
 
 ## Usage
 
-Use Laravel’s mail API as usual; no API key is required for the default endpoint.
+Use Laravel’s mail API as usual; no API key is required.
 
 ```php
 use Illuminate\Support\Facades\Mail;
@@ -102,7 +98,7 @@ Mail::mailer('shwanix')->send(...);
 
 | Feature | Behaviour |
 |--------|-----------|
-| Recipients | Single request with `to`, `cc`, `bcc` arrays (unique addresses); logs include `recipient_count`. |
+| Recipients | Single request; `to`, `cc`, and `bcc` are sent as **comma-separated strings** (API format), not JSON arrays. Logs include `recipient_count`. |
 | Body | Prefers HTML; otherwise plain text. |
 | Attachments | Symfony `DataPart` attachments encoded as base64 in JSON. |
 | Success | `info` log with `recipient_count` and HTTP status. |
@@ -113,7 +109,7 @@ Mail::mailer('shwanix')->send(...);
 One `POST` with JSON body:
 
 - **Headers:** `Content-Type: application/json`, `Accept: application/json`
-- **Fields:** `to`, `cc`, `bcc`, `subject`, `body`, `attachments` (`filename`, `mime`, `content` base64)
+- **Fields:** `to`, `cc`, `bcc` (comma-separated emails), `subject`, `body`, `attachments` (`filename`, `mime`, `content` base64)
 
 ## Implementation note (transport base class)
 
