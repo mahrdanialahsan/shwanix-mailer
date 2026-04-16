@@ -2,7 +2,9 @@
 
 Send Laravel mail through the **Shwanix HTTP mail API** (JSON `POST`) instead of SMTP. Works with standard `Mail` facades, Mailables, and queues.
 
-**Requirements:** PHP `^8.0` (Laravel 11+ needs PHP `^8.2`), Laravel `^8.83 | ^9 | ^10 | ^11 | ^12`, Guzzle `^7.5`.
+**Requirements:** PHP `^8.0`, Guzzle `^7.5`, Laravel **`^7.30` through `^12.0`** (see below).
+
+**Laravel & PHP:** Supports **Laravel 7.30+** through **12.x** (Composer cannot install this package on Laravel 7.0–7.29). Laravel **7** requires **PHP 8** via **7.30.x** for use with this package. Laravel **11+** needs PHP **^8.2** (framework requirement). Internally, **Laravel 7–8** use a SwiftMailer transport (`legacy/SwiftShwanixTransport.php`); **Laravel 9+** use Symfony Mailer (`ApiTransport`).
 
 ## Installation
 
@@ -115,7 +117,8 @@ One `POST` with JSON body:
 
 ## Implementation note (transport base class)
 
-Laravel’s `MailManager` expects a **Symfony Mailer** `TransportInterface`. This package’s `ApiTransport` extends `Symfony\Component\Mailer\Transport\AbstractTransport`, the same pattern Laravel uses for built-in drivers such as SES (`Illuminate\Mail\Transport\SesTransport`). There is no separate `Illuminate\Mail\Transport\Transport` base class in the framework.
+- **Laravel 9+:** `MailManager` uses Symfony Mailer. `ApiTransport` extends `Symfony\Component\Mailer\Transport\AbstractTransport`, like Laravel’s SES transport.
+- **Laravel 7–8:** Mail uses SwiftMailer. A dedicated `SwiftShwanixTransport` extends `Illuminate\Mail\Transport\Transport` and is loaded only on those versions (see `legacy/SwiftShwanixTransport.php`).
 
 ## Releasing
 

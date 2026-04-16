@@ -2,8 +2,8 @@
 
 namespace Danial\ShwanixMailer\Transport;
 
+use Danial\ShwanixMailer\ShwanixApiClient;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
@@ -13,10 +13,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
 
 /**
- * Sends mail by POSTing JSON to the Shwanix HTTP API.
- *
- * Extends Symfony Mailer's AbstractTransport, matching Laravel core drivers
- * (e.g. Illuminate\Mail\Transport\SesTransport) and Mail::extend() expectations.
+ * Sends mail by POSTing JSON to the Shwanix HTTP API (Laravel 9+ / Symfony Mailer).
  */
 class ApiTransport extends AbstractTransport
 {
@@ -77,64 +74,18 @@ class ApiTransport extends AbstractTransport
         ];
 
         try {
-            $response = $this->client->request('POST', $this->url, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ],
-                'json' => $payload,
-                'http_errors' => false,
-                'timeout' => $this->timeout,
-                'connect_timeout' => $this->connectTimeout,
-                'verify' => $this->verifySsl,
-            ]);
-
-            $statusCode = $response->getStatusCode();
-            $responseBody = (string) $response->getBody();
-
-            if ($statusCode < 200 || $statusCode >= 300) {
-                Log::error('Shwanix Mail API HTTP error', [
-                    'status' => $statusCode,
-                    'body' => $responseBody,
-                    'recipient_count' => $recipientCount,
-                ]);
-
-                throw new TransportException(
-                    sprintf('Shwanix Mail API failed with HTTP %d: %s', $statusCode, $responseBody)
-                );
-            }
-
-            if ($responseBody !== '') {
-                $decoded = json_decode($responseBody, true);
-                if (is_array($decoded) && array_key_exists('status', $decoded) && $decoded['status'] === false) {
-                    $apiMessage = isset($decoded['message']) ? (string) $decoded['message'] : 'Unknown API error';
-
-                    Log::error('Shwanix Mail API reported failure', [
-                        'message' => $apiMessage,
-                        'response' => $decoded,
-                        'recipient_count' => $recipientCount,
-                    ]);
-
-                    throw new TransportException('Shwanix Mail API: '.$apiMessage);
-                }
-            }
-
-            Log::info('Shwanix Mail API message sent', [
-                'recipient_count' => $recipientCount,
-                'http_status' => $statusCode,
-            ]);
-        } catch (GuzzleException $e) {
-            Log::error('Shwanix Mail API request failed', [
-                'exception' => $e->getMessage(),
-                'recipient_count' => $recipientCount,
-            ]);
-
-            throw new TransportException('Shwanix Mail API: '.$e->getMessage(), 0, $e);
+            ShwanixApiClient::send(
+                $this->client,
+                $this->url,
+                $payload,
+                $recipientCount,
+                $this->timeout,
+                $this->connectTimeout,
+                $this->verifySsl
+            );
+        } catch (\RuntimeException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
         } catch (\Throwable $e) {
-            if ($e instanceof TransportException) {
-                throw $e;
-            }
-
             Log::error('Shwanix Mail API unexpected error', [
                 'exception' => $e->getMessage(),
                 'recipient_count' => $recipientCount,
