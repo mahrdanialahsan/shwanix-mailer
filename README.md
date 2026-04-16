@@ -2,7 +2,7 @@
 
 Send Laravel mail through the **Shwanix HTTP mail API** (JSON `POST`) instead of SMTP. Works with standard `Mail` facades, Mailables, and queues.
 
-**Requirements:** PHP `^8.0`, Laravel `^8.83 | ^9.0 | ^10.0`, Guzzle `^7.5`.
+**Requirements:** PHP `^8.0` (Laravel 11+ needs PHP `^8.2`), Laravel `^8.83 | ^9 | ^10 | ^11 | ^12`, Guzzle `^7.5`.
 
 ## Installation
 
