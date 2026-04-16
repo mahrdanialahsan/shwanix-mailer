@@ -1,19 +1,33 @@
 {
     "name": "mahrdanial/shwanix-mailer",
-    "description": "Laravel mail driver that sends messages through the Shwanix HTTP mail API",
+    "description": "Laravel mail driver that sends messages through the Shwanix HTTP mail API (JSON POST) instead of SMTP.",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "laravel",
+        "laravel-package",
+        "mail",
+        "mailer",
+        "shwanix",
+        "http-api"
+    ],
     "authors": [
         {
             "name": "Mahr Danial Ahsan",
             "email": "mahrdanial@gmail.com"
         }
     ],
+    "homepage": "https://github.com/mahrdanialahsan/shwanix-mailer",
+    "support": {
+        "issues": "https://github.com/mahrdanialahsan/shwanix-mailer/issues",
+        "source": "https://github.com/mahrdanialahsan/shwanix-mailer"
+    },
     "require": {
         "php": "^8.0",
         "guzzlehttp/guzzle": "^7.5",
         "illuminate/mail": "^8.83|^9.0|^10.0",
         "illuminate/support": "^8.83|^9.0|^10.0",
+        "symfony/mailer": "^5.4|^6.0",
         "symfony/mime": "^5.4|^6.0"
     },
     "autoload": {
@@ -27,6 +41,9 @@
                 "Danial\\ShwanixMailer\\ShwanixMailerServiceProvider"
             ]
         }
+    },
+    "config": {
+        "sort-packages": true
     },
     "minimum-stability": "stable",
     "prefer-stable": true

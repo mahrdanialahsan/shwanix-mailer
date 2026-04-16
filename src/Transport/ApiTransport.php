@@ -15,13 +15,13 @@ use Symfony\Component\Mime\Part\DataPart;
 /**
  * Sends mail by POSTing JSON to the Shwanix HTTP API.
  *
- * Uses Symfony Mailer's transport contract (Laravel 8.35+ / 9 / 10).
+ * Extends Symfony Mailer's AbstractTransport, matching Laravel core drivers
+ * (e.g. Illuminate\Mail\Transport\SesTransport) and Mail::extend() expectations.
  */
 class ApiTransport extends AbstractTransport
 {
     public function __construct(
         private string $url,
-        private string $apiKey,
         private ClientInterface $client,
         private int $timeout = 30,
         private int $connectTimeout = 10,
@@ -58,14 +58,6 @@ class ApiTransport extends AbstractTransport
             throw new TransportException('Shwanix Mail API URL is not configured.');
         }
 
-        if ($this->apiKey === '') {
-            Log::error('Shwanix Mail API key is not configured.', [
-                'recipient_count' => $recipientCount,
-            ]);
-
-            throw new TransportException('Shwanix Mail API key is not configured.');
-        }
-
         $subject = (string) ($email->getSubject() ?? '');
         $htmlBody = $email->getHtmlBody();
         $textBody = $email->getTextBody();
@@ -87,7 +79,6 @@ class ApiTransport extends AbstractTransport
         try {
             $response = $this->client->request('POST', $this->url, [
                 'headers' => [
-                    'API-Key' => $this->apiKey,
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                 ],
@@ -139,6 +130,17 @@ class ApiTransport extends AbstractTransport
             ]);
 
             throw new TransportException('Shwanix Mail API: '.$e->getMessage(), 0, $e);
+        } catch (\Throwable $e) {
+            if ($e instanceof TransportException) {
+                throw $e;
+            }
+
+            Log::error('Shwanix Mail API unexpected error', [
+                'exception' => $e->getMessage(),
+                'recipient_count' => $recipientCount,
+            ]);
+
+            throw new TransportException('Shwanix Mail API: '.$e->getMessage(), (int) $e->getCode(), $e);
         }
     }
 

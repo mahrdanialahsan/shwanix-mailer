@@ -11,18 +11,7 @@ return [
     |
     */
 
-    'url' => env('SHWANIX_MAIL_URL'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | API key
-    |--------------------------------------------------------------------------
-    |
-    | Value sent as the API-Key header on each request.
-    |
-    */
-
-    'key' => env('SHWANIX_MAIL_KEY'),
+    'url' => env('SHWANIX_MAIL_URL', 'https://send-mail.shwanix.com/send-mail.php'),
 
     /*
     |--------------------------------------------------------------------------

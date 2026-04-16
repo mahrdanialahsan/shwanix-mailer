@@ -24,7 +24,6 @@ class ShwanixMailerServiceProvider extends ServiceProvider
             $cfg = config('shwanix-mail', []);
 
             $url = (string) ($cfg['url'] ?? '');
-            $key = (string) ($cfg['key'] ?? '');
             $timeout = (int) ($cfg['timeout'] ?? 30);
             $connectTimeout = (int) ($cfg['connect_timeout'] ?? 10);
             $verify = (bool) ($cfg['verify'] ?? true);
@@ -33,7 +32,6 @@ class ShwanixMailerServiceProvider extends ServiceProvider
 
             return new ApiTransport(
                 $url,
-                $key,
                 $client,
                 $timeout,
                 $connectTimeout,
