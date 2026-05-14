@@ -15,13 +15,13 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | API key (optional)
+    | API key
     |--------------------------------------------------------------------------
     |
-    | Plain secret from env. When set, the client sends:
-    | - JSON field "api_key" (server validates against bcrypt-stored keys), and
-    | - Headers "X-API-Key" and "API-Key" (either style is accepted by the API).
-    | Omit when your endpoint does not require authentication.
+    | Plain secret (e.g. SHWANIX_MAIL_KEY). Sent as JSON field "api_key", or as
+    | multipart form field "api_key" when the message includes attachments.
+    | The API may also accept header X-API-Key for manual calls; this package
+    | uses the body/form field only.
     |
     */
 

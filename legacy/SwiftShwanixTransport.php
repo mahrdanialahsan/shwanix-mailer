@@ -73,14 +73,27 @@ class SwiftShwanixTransport extends Transport
             throw new \RuntimeException('Shwanix Mail API URL is not configured.');
         }
 
+        $attachments = $this->collectAttachments($message);
+
         $payload = [
-            'to' => RecipientFormat::toApiField($to),
-            'cc' => RecipientFormat::toApiField($cc),
-            'bcc' => RecipientFormat::toApiField($bcc),
+            'to' => RecipientFormat::toApiTo($to),
             'subject' => (string) $message->getSubject(),
             'body' => $this->extractBody($message),
-            'attachments' => $this->collectAttachments($message),
         ];
+
+        $ccVal = RecipientFormat::toApiCcBcc($cc);
+        if ($ccVal !== null) {
+            $payload['cc'] = $ccVal;
+        }
+
+        $bccVal = RecipientFormat::toApiCcBcc($bcc);
+        if ($bccVal !== null) {
+            $payload['bcc'] = $bccVal;
+        }
+
+        if ($attachments !== []) {
+            $payload['attachments'] = $attachments;
+        }
 
         ShwanixApiClient::send(
             $this->client,

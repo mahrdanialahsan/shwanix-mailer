@@ -41,7 +41,7 @@ MAIL_MAILER=shwanix
 SHWANIX_MAIL_KEY=your-plain-secret
 ```
 
-`SHWANIX_MAIL_KEY` is **required**. Use the plain secret registered for your app (validated server-side, e.g. against a bcrypt hash). Each request sends **`api_key`** in the JSON body and **`X-API-Key`** / **`API-Key`** headers with that value.
+`SHWANIX_MAIL_KEY` is **required**. Use the plain secret registered for your app (validated server-side). It is sent as the **`api_key`** field in JSON (no attachments) or in **multipart/form-data** when files are attached.
 
 Optional tuning (defaults are set in `config/shwanix-mail.php`):
 
@@ -101,18 +101,18 @@ Mail::mailer('shwanix')->send(...);
 
 | Feature | Behaviour |
 |--------|-----------|
-| Recipients | Single request; `to`, `cc`, and `bcc` are sent as **comma-separated strings** (API format), not JSON arrays. Logs include `recipient_count`. |
+| Recipients | **`to`**: one string (comma-separated if multiple). **`cc` / `bcc`**: omitted when empty; otherwise a **string** for one address or a **JSON array** for several (matches the Shwanix API). Logs include **`recipient_count`**. |
 | Body | Prefers HTML; otherwise plain text. |
-| Attachments | Symfony `DataPart` attachments encoded as base64 in JSON. |
+| Attachments | With attachments: **`multipart/form-data`** with `attachments[]` file parts (decoded from Symfony/Swift parts). Without attachments: **`application/json`** with optional `attachments` as base64 objects. |
 | Success | `info` log with `recipient_count` and HTTP status. |
 | Failure | Non-2xx HTTP, Guzzle errors, or JSON `{ "status": false, "message": "..." }` → `TransportException` and `error` logs. |
 
 ### HTTP payload
 
-One `POST` with JSON body:
+- **No attachments:** `POST` as **`application/json`** with `api_key`, `to`, `subject`, `body`, and optional `cc` / `bcc` (string or array of emails per the API). No `attachments` key when there are none.
+- **With attachments:** `POST` as **`multipart/form-data`**: `api_key`, `to`, `subject`, `body`, optional `cc` / `bcc` (string or repeated `cc[]` / `bcc[]` parts), and binary **`attachments[]`** parts (filename + Content-Type from the mail part).
 
-- **Headers:** `Content-Type: application/json`, `Accept: application/json`, **`X-API-Key`**, **`API-Key`** (values from `SHWANIX_MAIL_KEY`)
-- **Fields:** **`api_key`** (same secret), `to`, `cc`, `bcc` (comma-separated emails), `subject`, `body`, `attachments` (`filename`, `mime`, `content` base64)
+Responses are still treated as JSON when the server returns a JSON body (e.g. `{ "status": true }`).
 
 ## Implementation note (transport base class)
 
