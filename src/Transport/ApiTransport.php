@@ -67,13 +67,24 @@ class ApiTransport extends AbstractTransport
         $attachments = $this->collectAttachments($email);
 
         $payload = [
-            'to' => RecipientFormat::toApiField($to),
-            'cc' => RecipientFormat::toApiField($cc),
-            'bcc' => RecipientFormat::toApiField($bcc),
+            'to' => RecipientFormat::toApiTo($to),
             'subject' => $subject,
             'body' => $body,
-            'attachments' => $attachments,
         ];
+
+        $ccVal = RecipientFormat::toApiCcBcc($cc);
+        if ($ccVal !== null) {
+            $payload['cc'] = $ccVal;
+        }
+
+        $bccVal = RecipientFormat::toApiCcBcc($bcc);
+        if ($bccVal !== null) {
+            $payload['bcc'] = $bccVal;
+        }
+
+        if ($attachments !== []) {
+            $payload['attachments'] = $attachments;
+        }
 
         try {
             ShwanixApiClient::send(
